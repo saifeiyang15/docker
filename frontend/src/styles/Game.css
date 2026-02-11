@@ -1,0 +1,172 @@
+.game-container {
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 20px 30px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.game-header h2 {
+  color: #333;
+  margin: 0;
+}
+
+.leave-btn {
+  padding: 10px 24px;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.game-content {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 20px;
+}
+
+.game-board-container {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.game-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.players-list {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.players-list h3 {
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.player-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  background: #f8f9fa;
+}
+
+.player-item.active {
+  background: #e3f2fd;
+  border: 2px solid #667eea;
+}
+
+.player-color {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid #333;
+}
+
+.finished-badge {
+  margin-left: auto;
+  padding: 4px 8px;
+  background: #4caf50;
+  color: white;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.game-controls {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.dice-display {
+  margin-bottom: 20px;
+}
+
+.dice {
+  width: 80px;
+  height: 80px;
+  background: white;
+  border: 3px solid #333;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  font-weight: bold;
+  color: #333;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.roll-dice-btn {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.roll-dice-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.roll-dice-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.waiting-message {
+  color: #666;
+  font-size: 14px;
+}
+
+.game-result {
+  padding: 20px;
+  background: #f0f8ff;
+  border-radius: 8px;
+}
+
+.game-result h3 {
+  color: #4caf50;
+  margin-bottom: 10px;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  color: white;
+  font-size: 24px;
+}
+
+@media (max-width: 768px) {
+  .game-content {
+    grid-template-columns: 1fr;
+  }
+}

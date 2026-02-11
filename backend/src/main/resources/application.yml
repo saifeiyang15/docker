@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: flight-chess-game
+  datasource:
+    url: jdbc:mysql://localhost:3306/flight_chess?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: root123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+server:
+  port: 8080
+
+jwt:
+  secret: YourSecretKeyForJWTTokenGenerationMustBeLongEnough123456789
+  expiration: 86400000
+
+cors:
+  allowed-origins: http://localhost:4000,http://8.130.166.199:4000

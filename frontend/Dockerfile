@@ -11,7 +11,8 @@ COPY package.json package-lock.json* ./
 RUN npm config set fetch-retry-maxtimeout 600000 && \
     npm config set fetch-retry-mintimeout 100000 && \
     rm -rf node_modules package-lock.json && \
-    npm install --legacy-peer-deps --verbose
+    npm install --legacy-peer-deps --verbose && \
+    npm install ajv@8.17.1 --legacy-peer-deps
 
 # 复制源代码并构建
 COPY . .

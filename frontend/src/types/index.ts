@@ -75,3 +75,44 @@ export interface DiceRollResult {
   canMove: boolean;
   message?: string;
 }
+
+export interface FriendPlayerState {
+  playerId: number;
+  userId: number;
+  username: string;
+  currentPosition: number;
+  score: number;
+  color: string;
+}
+
+export interface FriendGameTask {
+  id: number;
+  title: string;
+  description: string;
+  position: number;
+  type: 'FORWARD' | 'BACKWARD' | 'BONUS' | 'CHALLENGE';
+  reward: number;
+  timeLimit: number;
+}
+
+export interface FriendGameState {
+  roomCode: string;
+  player1: FriendPlayerState;
+  player2: FriendPlayerState | null;
+  currentTurn: number;
+  diceValue: number;
+  gameStatus: 'WAITING' | 'PLAYING' | 'FINISHED' | 'CANCELLED';
+  currentTask: FriendGameTask | null;
+  winner: number | null;
+  tasks: FriendGameTask[];
+  message?: string;
+}
+
+export interface FriendRollResult {
+  diceValue: number;
+  newPosition: number;
+  finalPosition: number;
+  currentPlayerId: number;
+  task: FriendGameTask | null;
+  gameState: FriendGameState;
+}

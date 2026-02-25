@@ -7,6 +7,7 @@ import TemplateManagement from './pages/TemplateManagement';
 import TwoPlayerGame from './pages/TwoPlayerGame';
 import SinglePlayerGame from './pages/SinglePlayerGame';
 import GameConfigManagement from './pages/GameConfigManagement';
+import FriendGame from './pages/FriendGame';
 import { isAuthenticated } from './utils/auth';
 import './App.css';
 
@@ -65,6 +66,14 @@ const App: React.FC = () => {
             element={
               <PrivateRoute>
                 <GameConfigManagement />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/friend-game/:roomCode"
+            element={
+              <PrivateRoute>
+                <FriendGame />
               </PrivateRoute>
             }
           />

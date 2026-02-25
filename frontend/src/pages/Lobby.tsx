@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { gameAPI } from '../services/api';
+import { gameAPI, friendGameAPI } from '../services/api';
 import { getUser, logout } from '../utils/auth';
 import { GameRoom } from '../types';
 import '../styles/Lobby.css';
@@ -8,6 +8,8 @@ import '../styles/Lobby.css';
 const Lobby: React.FC = () => {
   const [rooms, setRooms] = useState<GameRoom[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showFriendModal, setShowFriendModal] = useState(false);
+  const [friendRoomCode, setFriendRoomCode] = useState('');
   const [roomName, setRoomName] = useState('');
   const navigate = useNavigate();
   const user = getUser();
@@ -49,6 +51,28 @@ const Lobby: React.FC = () => {
     }
   };
 
+  const handleCreateFriendGame = async () => {
+    try {
+      const gameState = await friendGameAPI.createGame(user.id, user.nickname || user.username);
+      navigate(`/friend-game/${gameState.roomCode}`);
+    } catch (err) {
+      alert('创建好友房间失败');
+    }
+  };
+
+  const handleJoinFriendGame = async () => {
+    if (!friendRoomCode.trim()) {
+      alert('请输入房间号');
+      return;
+    }
+    try {
+      await friendGameAPI.joinGame(friendRoomCode.trim().toUpperCase(), user.id, user.nickname || user.username);
+      navigate(`/friend-game/${friendRoomCode.trim().toUpperCase()}`);
+    } catch (err: any) {
+      alert(err.response?.data?.error || '加入好友房间失败');
+    }
+  };
+
   const handleLogout = () => {
     logout();
     navigate('/');
@@ -68,6 +92,12 @@ const Lobby: React.FC = () => {
         <div className="actions">
           <button onClick={() => navigate('/single-player')} className="single-player-btn">
             单人游戏
+          </button>
+          <button onClick={handleCreateFriendGame} className="friend-create-btn">
+            好友对战
+          </button>
+          <button onClick={() => setShowFriendModal(true)} className="friend-join-btn">
+            加入好友
           </button>
           <button onClick={() => navigate('/game-config')} className="config-btn">
             游戏配置
@@ -117,6 +147,30 @@ const Lobby: React.FC = () => {
           )}
         </div>
       </div>
+
+      {showFriendModal && (
+        <div className="modal-overlay" onClick={() => setShowFriendModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h2>加入好友房间</h2>
+            <p style={{ color: '#666', marginBottom: '16px', fontSize: '14px' }}>
+              输入好友分享的房间号，一起开始甜蜜冒险吧～ 💕
+            </p>
+            <input
+              type="text"
+              placeholder="输入房间号（如：ABC123）"
+              value={friendRoomCode}
+              onChange={(e) => setFriendRoomCode(e.target.value.toUpperCase())}
+              className="room-name-input"
+              maxLength={6}
+              style={{ textAlign: 'center', letterSpacing: '4px', fontSize: '18px', fontWeight: 700 }}
+            />
+            <div className="modal-actions">
+              <button onClick={handleJoinFriendGame} className="confirm-btn">加入</button>
+              <button onClick={() => setShowFriendModal(false)} className="cancel-btn">取消</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showCreateModal && (
         <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>

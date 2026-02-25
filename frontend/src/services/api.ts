@@ -83,4 +83,26 @@ export const templateAPI = {
   },
 };
 
+export const friendGameAPI = {
+  createGame: async (userId: number, username: string): Promise<any> => {
+    const response = await api.post('/api/game/friend/create', { userId, username });
+    return response.data;
+  },
+
+  joinGame: async (roomCode: string, userId: number, username: string): Promise<any> => {
+    const response = await api.post(`/api/game/friend/join/${roomCode}`, { userId, username });
+    return response.data;
+  },
+
+  getGameState: async (roomCode: string): Promise<any> => {
+    const response = await api.get(`/api/game/friend/state/${roomCode}`);
+    return response.data;
+  },
+
+  resetGame: async (roomCode: string): Promise<any> => {
+    const response = await api.post(`/api/game/friend/reset/${roomCode}`);
+    return response.data;
+  },
+};
+
 export default api;

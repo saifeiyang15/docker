@@ -54,7 +54,7 @@
   flex-wrap: wrap;
 }
 
-.create-btn, .refresh-btn, .template-btn, .single-player-btn, .config-btn {
+.create-btn, .refresh-btn, .template-btn, .single-player-btn, .config-btn, .friend-create-btn, .friend-join-btn {
   padding: 12px 24px;
   border: none;
   border-radius: 6px;
@@ -73,6 +73,16 @@
   color: #333;
 }
 
+.friend-create-btn {
+  background: linear-gradient(135deg, #E91E63 0%, #FF6090 100%);
+  color: white;
+}
+
+.friend-join-btn {
+  background: linear-gradient(135deg, #FF6090 0%, #FFB74D 100%);
+  color: white;
+}
+
 .create-btn {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
@@ -88,7 +98,7 @@
   color: #333;
 }
 
-.create-btn:hover, .refresh-btn:hover, .template-btn:hover, .single-player-btn:hover, .config-btn:hover {
+.create-btn:hover, .refresh-btn:hover, .template-btn:hover, .single-player-btn:hover, .config-btn:hover, .friend-create-btn:hover, .friend-join-btn:hover {
   transform: translateY(-2px);
 }
 

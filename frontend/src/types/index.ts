@@ -50,3 +50,28 @@ export interface GameState {
   gameStatus: 'WAITING' | 'PLAYING' | 'FINISHED';
   winner?: Player;
 }
+
+export interface GameTemplate {
+  id?: number;
+  name: string;
+  description: string;
+  boardSize: number;
+  maxPlayers: number;
+  specialCells: SpecialCell[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface SpecialCell {
+  position: number;
+  type: 'FORWARD' | 'BACKWARD' | 'SKIP' | 'EXTRA_TURN';
+  value: number;
+  description: string;
+}
+
+export interface DiceRollResult {
+  value: number;
+  playerId: number;
+  canMove: boolean;
+  message?: string;
+}

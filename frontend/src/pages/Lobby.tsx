@@ -66,8 +66,17 @@ const Lobby: React.FC = () => {
 
       <div className="lobby-content">
         <div className="actions">
+          <button onClick={() => navigate('/single-player')} className="single-player-btn">
+            单人游戏
+          </button>
+          <button onClick={() => navigate('/game-config')} className="config-btn">
+            游戏配置
+          </button>
           <button onClick={() => setShowCreateModal(true)} className="create-btn">
             创建房间
+          </button>
+          <button onClick={() => navigate('/templates')} className="template-btn">
+            模板管理
           </button>
           <button onClick={loadRooms} className="refresh-btn">
             刷新列表
@@ -85,13 +94,23 @@ const Lobby: React.FC = () => {
                   <h3>{room.roomName}</h3>
                   <p>房间号：{room.roomCode}</p>
                   <p>玩家：{room.currentPlayers}/{room.maxPlayers}</p>
-                  <button
-                    onClick={() => handleJoinRoom(room.roomCode)}
-                    disabled={room.currentPlayers >= room.maxPlayers}
-                    className="join-btn"
-                  >
-                    {room.currentPlayers >= room.maxPlayers ? '房间已满' : '加入房间'}
-                  </button>
+                  <div className="room-actions">
+                    <button
+                      onClick={() => handleJoinRoom(room.roomCode)}
+                      disabled={room.currentPlayers >= room.maxPlayers}
+                      className="join-btn"
+                    >
+                      {room.currentPlayers >= room.maxPlayers ? '房间已满' : '加入房间'}
+                    </button>
+                    {room.maxPlayers === 2 && room.currentPlayers < room.maxPlayers && (
+                      <button
+                        onClick={() => navigate(`/two-player/${room.roomCode}`)}
+                        className="two-player-btn"
+                      >
+                        两人对战
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

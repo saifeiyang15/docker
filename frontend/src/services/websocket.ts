@@ -2,7 +2,7 @@ import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
 import type { IMessage } from '@stomp/stompjs';
 
-const WS_URL = process.env.REACT_APP_WS_URL || 'http://localhost:8080/ws';
+const WS_URL = process.env.REACT_APP_WS_URL || `${window.location.origin}/ws`;
 
 class WebSocketService {
   private client: Client | null = null;

@@ -18,6 +18,14 @@ const Game: React.FC = () => {
       () => {
         setConnected(true);
         websocketService.subscribe(`/topic/game/${roomCode}`, handleGameUpdate);
+        
+        // 连接成功后，发送加入游戏的消息
+        setTimeout(() => {
+          websocketService.send(`/app/game/${roomCode}/join`, {
+            userId: user.id,
+            username: user.username
+          });
+        }, 500);
       },
       (error) => {
         console.error('WebSocket connection error:', error);
@@ -29,7 +37,7 @@ const Game: React.FC = () => {
     return () => {
       websocketService.disconnect();
     };
-  }, [roomCode, navigate]);
+  }, [roomCode, navigate, user]);
 
   const handleGameUpdate = (message: any) => {
     setGameState(message);

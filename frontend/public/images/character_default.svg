@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
+  <!-- 背景圆 -->
+  <circle cx="60" cy="60" r="55" fill="#4CAF50" opacity="0.9"/>
+  
+  <!-- 脸部 -->
+  <circle cx="60" cy="60" r="45" fill="#FFE082"/>
+  
+  <!-- 眼睛 -->
+  <circle cx="45" cy="50" r="5" fill="#333"/>
+  <circle cx="75" cy="50" r="5" fill="#333"/>
+  
+  <!-- 眼睛高光 -->
+  <circle cx="46" cy="48" r="2" fill="#FFF"/>
+  <circle cx="76" cy="48" r="2" fill="#FFF"/>
+  
+  <!-- 微笑 -->
+  <path d="M 40 70 Q 60 80 80 70" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round"/>
+  
+  <!-- 腮红 -->
+  <circle cx="35" cy="65" r="6" fill="#FF8A80" opacity="0.5"/>
+  <circle cx="85" cy="65" r="6" fill="#FF8A80" opacity="0.5"/>
+  
+  <!-- 装饰 - 头发 -->
+  <ellipse cx="60" cy="25" rx="35" ry="15" fill="#8D6E63"/>
+  
+  <!-- 装饰 - 帽子 -->
+  <path d="M 30 30 Q 60 15 90 30" fill="#2196F3"/>
+  <circle cx="60" cy="20" r="8" fill="#FFC107"/>
+</svg>

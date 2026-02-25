@@ -36,7 +36,7 @@ const Login: React.FC = () => {
   return (
     <div className="login-container">
       <div className="login-box">
-        <h1>{isLogin ? '登录' : '注册'}</h1>
+        <h1>{isLogin ? '请登录' : '注册'}</h1>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>用户名</label>

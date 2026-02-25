@@ -51,9 +51,10 @@
   display: flex;
   gap: 15px;
   margin-bottom: 30px;
+  flex-wrap: wrap;
 }
 
-.create-btn, .refresh-btn {
+.create-btn, .refresh-btn, .template-btn, .single-player-btn, .config-btn {
   padding: 12px 24px;
   border: none;
   border-radius: 6px;
@@ -62,8 +63,23 @@
   transition: transform 0.2s;
 }
 
+.single-player-btn {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  color: white;
+}
+
+.config-btn {
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  color: #333;
+}
+
 .create-btn {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.template-btn {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
   color: white;
 }
 
@@ -72,7 +88,7 @@
   color: #333;
 }
 
-.create-btn:hover, .refresh-btn:hover {
+.create-btn:hover, .refresh-btn:hover, .template-btn:hover, .single-player-btn:hover, .config-btn:hover {
   transform: translateY(-2px);
 }
 
@@ -117,21 +133,41 @@
   font-size: 14px;
 }
 
-.join-btn {
-  width: 100%;
+.room-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   margin-top: 15px;
+}
+
+.join-btn, .two-player-btn {
+  width: 100%;
   padding: 10px;
-  background: #667eea;
-  color: white;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
+  transition: transform 0.2s;
+}
+
+.join-btn {
+  background: #667eea;
+  color: white;
+}
+
+.two-player-btn {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+}
+
+.join-btn:hover, .two-player-btn:hover {
+  transform: translateY(-2px);
 }
 
 .join-btn:disabled {
   background: #ccc;
   cursor: not-allowed;
+  transform: none;
 }
 
 .modal-overlay {

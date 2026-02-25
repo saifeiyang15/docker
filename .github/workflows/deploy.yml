@@ -1,0 +1,184 @@
+name: Deploy Flight Chess Game
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  PROJECT_NAME: flight-chess-game
+  REMOTE_DIR: /opt/flight-chess-game
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      # ========== 1. 拉取代码 ==========
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ========== 2. 构建前端 ==========
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci --legacy-peer-deps
+
+      - name: Build frontend
+        working-directory: frontend
+        run: |
+          rm -rf build
+          npm run build
+
+      - name: Verify build output
+        run: |
+          if [ ! -d "frontend/build" ]; then
+            echo "❌ Frontend build failed: build directory not found"
+            exit 1
+          fi
+          if grep -r "localhost:8080" frontend/build/ 2>/dev/null; then
+            echo "⚠️ Warning: localhost:8080 found in build output"
+          else
+            echo "✅ Build output clean, no localhost:8080 references"
+          fi
+
+      # ========== 3. 同步文件到服务器 ==========
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Sync frontend build files
+        run: |
+          rsync -avz --delete \
+            -e "ssh -i ~/.ssh/deploy_key" \
+            frontend/build/ \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ env.REMOTE_DIR }}/frontend/build/
+
+      - name: Sync frontend config files
+        run: |
+          rsync -avz \
+            -e "ssh -i ~/.ssh/deploy_key" \
+            frontend/nginx.conf \
+            frontend/Dockerfile \
+            frontend/Dockerfile.prod \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ env.REMOTE_DIR }}/frontend/
+
+      - name: Sync backend code
+        run: |
+          rsync -avz --delete \
+            -e "ssh -i ~/.ssh/deploy_key" \
+            --exclude='target/' \
+            --exclude='.idea/' \
+            --exclude='*.log' \
+            backend/ \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ env.REMOTE_DIR }}/backend/
+
+      - name: Sync docker-compose and database config
+        run: |
+          rsync -avz \
+            -e "ssh -i ~/.ssh/deploy_key" \
+            docker-compose.prod-prebuilt.yml \
+            docker-compose.prod.yml \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ env.REMOTE_DIR }}/
+
+          rsync -avz \
+            -e "ssh -i ~/.ssh/deploy_key" \
+            mysql/ \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ env.REMOTE_DIR }}/mysql/
+
+      # ========== 4. 在服务器上重建并重启容器 ==========
+      - name: Deploy on server
+        run: |
+          ssh -i ~/.ssh/deploy_key ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'ENDSSH'
+          set -e
+          cd /opt/flight-chess-game
+
+          echo "🛑 Stopping old containers..."
+          docker-compose -f docker-compose.prod-prebuilt.yml down || true
+
+          echo "🔨 Rebuilding frontend image..."
+          docker-compose -f docker-compose.prod-prebuilt.yml build --no-cache frontend
+
+          echo "🔨 Rebuilding backend image..."
+          docker-compose -f docker-compose.prod-prebuilt.yml build --no-cache backend
+
+          echo "🚀 Starting all containers..."
+          docker-compose -f docker-compose.prod-prebuilt.yml up -d
+
+          echo "⏳ Waiting for services to start..."
+          sleep 25
+
+          echo "📊 Container status:"
+          docker-compose -f docker-compose.prod-prebuilt.yml ps
+          ENDSSH
+
+      # ========== 5. 健康检查 ==========
+      - name: Health check
+        run: |
+          ssh -i ~/.ssh/deploy_key ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'ENDSSH'
+          set -e
+
+          echo "🔍 Running health checks..."
+
+          # 检查前端
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:80 > /dev/null 2>&1; then
+              echo "✅ Frontend is healthy"
+              break
+            fi
+            if [ $i -eq 30 ]; then
+              echo "❌ Frontend health check failed"
+              docker-compose -f /opt/flight-chess-game/docker-compose.prod-prebuilt.yml logs frontend --tail=20
+              exit 1
+            fi
+            sleep 2
+          done
+
+          # 检查后端
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:8080/api/auth/validate > /dev/null 2>&1; then
+              echo "✅ Backend is healthy"
+              break
+            fi
+            if [ $i -eq 30 ]; then
+              echo "❌ Backend health check failed"
+              docker-compose -f /opt/flight-chess-game/docker-compose.prod-prebuilt.yml logs backend --tail=20
+              exit 1
+            fi
+            sleep 2
+          done
+
+          # 验证 nginx 代理配置
+          if docker exec flight-chess-frontend cat /etc/nginx/conf.d/default.conf | grep -q "proxy_pass"; then
+            echo "✅ Nginx proxy config is active"
+          else
+            echo "⚠️ Warning: Nginx proxy config may not be active"
+          fi
+
+          # 验证前端产物无 localhost 引用
+          if docker exec flight-chess-frontend sh -c "grep -r 'localhost:8080' /usr/share/nginx/html/" 2>/dev/null; then
+            echo "⚠️ Warning: localhost:8080 still found in frontend files"
+          else
+            echo "✅ No localhost:8080 in frontend files"
+          fi
+
+          echo ""
+          echo "🎉 Deployment completed successfully!"
+          echo "🌐 Frontend: http://$(curl -s ifconfig.me)"
+          ENDSSH
+
+      # ========== 6. 清理 SSH 密钥 ==========
+      - name: Cleanup SSH key
+        if: always()
+        run: rm -f ~/.ssh/deploy_key

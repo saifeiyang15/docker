@@ -96,9 +96,17 @@ sync_other_files() {
         backend/ \
         ${SERVER_USER}@${SERVER_IP}:${REMOTE_DIR}/backend/
     
+    # 同步前端配置文件（nginx.conf、Dockerfile 等）
+    rsync -avz --progress \
+        frontend/nginx.conf \
+        frontend/Dockerfile \
+        frontend/Dockerfile.prod \
+        ${SERVER_USER}@${SERVER_IP}:${REMOTE_DIR}/frontend/
+
     # 同步 docker-compose 配置（如果有更新）
     rsync -avz --progress \
         docker-compose.prod-prebuilt.yml \
+        docker-compose.prod.yml \
         ${SERVER_USER}@${SERVER_IP}:${REMOTE_DIR}/
     
     echo -e "${GREEN}✓ 其他文件同步完成${NC}"

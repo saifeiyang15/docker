@@ -90,14 +90,15 @@ jobs:
             sleep 2
           done
 
-          # 检查后端
+          # 检查后端（使用 HTTP 状态码判断，401/403 也说明服务已启动）
           for i in $(seq 1 30); do
-            if curl -sf http://localhost:8080/api/auth/validate > /dev/null 2>&1; then
-              echo "✅ Backend is healthy"
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/api/auth/validate 2>/dev/null || echo "000")
+            if [ "$HTTP_CODE" != "000" ]; then
+              echo "✅ Backend is healthy (HTTP $HTTP_CODE)"
               break
             fi
             if [ $i -eq 30 ]; then
-              echo "❌ Backend health check failed"
+              echo "❌ Backend health check failed - service not responding"
               docker-compose -f /opt/flight-chess-game/docker-compose.prod.yml logs backend --tail=20
               exit 1
             fi

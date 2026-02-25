@@ -25,22 +25,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
 
-      - name: Install frontend dependencies
+      - name: Install and build frontend
         working-directory: frontend
         env:
           CI: false
-        run: npm install --legacy-peer-deps
-
-      - name: Build frontend
-        working-directory: frontend
-        env:
-          CI: false
+          NODE_OPTIONS: "--max-old-space-size=4096"
         run: |
-          rm -rf build
-          npm run build
+          rm -rf node_modules package-lock.json build
+          npm install --legacy-peer-deps --verbose
+          npx react-scripts build
 
       - name: Verify build output
         run: |

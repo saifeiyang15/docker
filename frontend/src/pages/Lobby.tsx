@@ -93,6 +93,9 @@ const Lobby: React.FC = () => {
           <button onClick={() => navigate('/single-player')} className="single-player-btn">
             单人游戏
           </button>
+          <button onClick={() => navigate('/game-3d')} className="game-3d-btn">
+            3D 飞行棋
+          </button>
           <button onClick={handleCreateFriendGame} className="friend-create-btn">
             好友对战
           </button>

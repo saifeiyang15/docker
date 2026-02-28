@@ -8,6 +8,7 @@ import TwoPlayerGame from './pages/TwoPlayerGame';
 import SinglePlayerGame from './pages/SinglePlayerGame';
 import GameConfigManagement from './pages/GameConfigManagement';
 import FriendGame from './pages/FriendGame';
+import Game3D from './pages/Game3D';
 import { isAuthenticated } from './utils/auth';
 import './App.css';
 
@@ -74,6 +75,14 @@ const App: React.FC = () => {
             element={
               <PrivateRoute>
                 <FriendGame />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/game-3d"
+            element={
+              <PrivateRoute>
+                <Game3D />
               </PrivateRoute>
             }
           />

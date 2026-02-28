@@ -51,7 +51,7 @@ public class UrlRewriteFilter {
                 filterChain.doFilter(request, response);
             }
         });
-        registration.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 1);
         registration.addUrlPatterns("/*");
         return registration;
     }

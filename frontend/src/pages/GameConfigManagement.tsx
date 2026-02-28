@@ -14,11 +14,29 @@ interface GameTask {
   isActive?: boolean;
 }
 
+const DEFAULT_TASKS: GameTask[] = [
+  { title: '幸运之星', description: '运气爆棚！前进3步', position: 3, type: 'FORWARD', reward: 3, timeLimit: 0, isActive: true },
+  { title: '甜蜜告白', description: '对对方说一句最想说的情话', position: 5, type: 'BONUS', reward: 0, timeLimit: 30, isActive: true },
+  { title: '倒霉蛋', description: '踩到香蕉皮，后退2步', position: 8, type: 'BACKWARD', reward: 2, timeLimit: 0, isActive: true },
+  { title: '比心挑战', description: '两人一起比心拍照留念', position: 10, type: 'CHALLENGE', reward: 0, timeLimit: 20, isActive: true },
+  { title: '加速冲刺', description: '一路顺风！前进5步', position: 13, type: 'FORWARD', reward: 5, timeLimit: 0, isActive: true },
+  { title: '真心话', description: '回答对方一个真心话问题', position: 16, type: 'BONUS', reward: 0, timeLimit: 60, isActive: true },
+  { title: '小惩罚', description: '走错路了，后退3步', position: 19, type: 'BACKWARD', reward: 3, timeLimit: 0, isActive: true },
+  { title: '默契考验', description: '两人同时说出对方最喜欢的食物', position: 22, type: 'CHALLENGE', reward: 0, timeLimit: 15, isActive: true },
+  { title: '顺风车', description: '搭上顺风车，前进4步', position: 25, type: 'FORWARD', reward: 4, timeLimit: 0, isActive: true },
+  { title: '拥抱时刻', description: '给对方一个大大的拥抱', position: 28, type: 'BONUS', reward: 0, timeLimit: 10, isActive: true },
+  { title: '迷路了', description: '走错方向，后退4步', position: 31, type: 'BACKWARD', reward: 4, timeLimit: 0, isActive: true },
+  { title: '才艺展示', description: '为对方唱一首歌或跳一段舞', position: 34, type: 'CHALLENGE', reward: 0, timeLimit: 60, isActive: true },
+  { title: '火箭加速', description: '坐上火箭！前进6步', position: 37, type: 'FORWARD', reward: 6, timeLimit: 0, isActive: true },
+  { title: '大冒险', description: '完成对方指定的一个小任务', position: 39, type: 'CHALLENGE', reward: 0, timeLimit: 120, isActive: true },
+];
+
 const GameConfigManagement: React.FC = () => {
   const navigate = useNavigate();
   const [tasks, setTasks] = useState<GameTask[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [editingTask, setEditingTask] = useState<GameTask | null>(null);
+  const [importing, setImporting] = useState(false);
   const [formData, setFormData] = useState<GameTask>({
     title: '',
     description: '',
@@ -107,6 +125,58 @@ const GameConfigManagement: React.FC = () => {
     return labels[type] || type;
   };
 
+  const handleCopy = (task: GameTask) => {
+    const usedPositions = new Set(tasks.map(t => t.position));
+    let nextPosition = task.position;
+    for (let i = 0; i < 40; i++) {
+      const candidate = (task.position + i + 1) % 40;
+      if (!usedPositions.has(candidate)) {
+        nextPosition = candidate;
+        break;
+      }
+    }
+
+    setEditingTask(null);
+    setFormData({
+      title: task.title,
+      description: task.description,
+      position: nextPosition,
+      type: task.type,
+      reward: task.reward,
+      timeLimit: task.timeLimit,
+      isActive: true,
+    });
+    setShowModal(true);
+  };
+
+  const handleImportDefaults = async () => {
+    if (!window.confirm('确定要导入默认任务吗？已存在相同位置的任务不会被覆盖。')) {
+      return;
+    }
+    setImporting(true);
+    try {
+      const existingPositions = new Set(tasks.map(t => t.position));
+      const tasksToImport = DEFAULT_TASKS.filter(t => !existingPositions.has(t.position));
+
+      if (tasksToImport.length === 0) {
+        alert('所有默认任务的位置都已被占用，无需导入');
+        setImporting(false);
+        return;
+      }
+
+      for (const task of tasksToImport) {
+        await axios.post(`${API_URL}/api/game/tasks`, task);
+      }
+      await loadTasks();
+      alert(`成功导入 ${tasksToImport.length} 个默认任务！`);
+    } catch (error) {
+      console.error('导入默认任务失败:', error);
+      alert('导入默认任务失败，请重试');
+    } finally {
+      setImporting(false);
+    }
+  };
+
   const getTaskTypeColor = (type: string) => {
     const colors: { [key: string]: string } = {
       FORWARD: '#4CAF50',
@@ -124,6 +194,9 @@ const GameConfigManagement: React.FC = () => {
         <div className="header-actions">
           <button onClick={() => openModal()} className="add-button">
             ✨ 添加新任务
+          </button>
+          <button onClick={handleImportDefaults} className="import-button" disabled={importing}>
+            {importing ? '导入中...' : '📦 导入默认任务'}
           </button>
           <button onClick={() => navigate('/lobby')} className="back-button">
             返回大厅
@@ -205,6 +278,9 @@ const GameConfigManagement: React.FC = () => {
                 <div className="task-card-actions">
                   <button onClick={() => openModal(task)} className="edit-button">
                     ✏️ 编辑
+                  </button>
+                  <button onClick={() => handleCopy(task)} className="copy-button">
+                    📋 复制
                   </button>
                   <button onClick={() => task.id && handleDelete(task.id)} className="delete-button">
                     🗑️ 删除
